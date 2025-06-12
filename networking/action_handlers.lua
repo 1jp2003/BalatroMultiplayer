@@ -316,17 +316,22 @@ function poll_edition(_key, _mod, _no_neg, _guaranteed)
 	return origedpoll(_key, _mod, _no_neg, _guaranteed)
 end
 
-local function action_speedrun()
-	local function speedrun(card)
-		card:juice_up()
-		if #G.consumeables.cards < G.consumeables.config.card_limit then
-			local card = create_card("Spectral", G.consumeables, nil, nil, nil, nil, nil, "speedrun")
-			card:add_to_deck()
-			G.consumeables:emplace(card)
-		end
-	end
-	MP.UTILS.run_for_each_joker("j_mp_speedrun", speedrun)
+---@param is_first boolean
+local function action_readied_up(is_first)
+	SMODS.calculate_context({mp_readied_up = true, mp_is_first = is_first})
 end
+
+--local function action_speedrun()
+--	local function speedrun(card)
+--		card:juice_up()
+--		if #G.consumeables.cards < G.consumeables.config.card_limit then
+--			local card = create_card("Spectral", G.consumeables, nil, nil, nil, nil, nil, "speedrun")
+--			card:add_to_deck()
+--			G.consumeables:emplace(card)
+--		end
+--	end
+--	MP.UTILS.run_for_each_joker("j_mp_speedrun", speedrun)
+--end
 
 local function enemyLocation(options)
 	local location = options.location
@@ -968,7 +973,8 @@ function Game:update(dt)
 			elseif parsedAction.action == "removePhantom" then
 				action_remove_phantom(parsedAction.key)
 			elseif parsedAction.action == "speedrun" then
-				action_speedrun()
+				-- fix this so that you can check if the player is ready first or not 
+				action_readied_up(true)
 			elseif parsedAction.action == "asteroid" then
 				action_asteroid()
 			elseif parsedAction.action == "soldJoker" then
